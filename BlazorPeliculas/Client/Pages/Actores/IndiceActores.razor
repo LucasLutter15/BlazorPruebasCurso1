@@ -1,0 +1,76 @@
+﻿@page "/actores"
+@inject IRepositorio repositorio
+@inject NavigationManager navigationManager
+@inject SweetAlertService swal
+
+<h3>Indice Actores</h3>
+
+<div class="mb-3">
+    <a href="/actores/crear" class="btn btn-info">Crear Actor</a>
+
+</div>
+
+<ListadoGenerico Listado="Actores">
+    <HayRegistrosCompleto>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Nombre</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Actores!)
+                {
+                    <tr>
+                        <td>
+                            <a href="actores/editar/@item.Id" class="btn btn-success">Editar</a>
+                            <button class="btn btn-danger" @onclick=@(() =>Borrar(item))>Borrar</button>
+                        </td>
+                        <td>
+                            @item.Nombre
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </HayRegistrosCompleto>
+
+</ListadoGenerico>
+
+
+@code {
+    public List<Actor>? Actores { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Cargar();
+    }
+    private async Task Cargar()
+    {
+        var respuestaHttp = await repositorio.Get<List<Actor>>("api/actores");
+        Actores = respuestaHttp.Response;
+    }
+
+    private async Task Borrar(Actor actor)
+    {
+        var responseHTTP = await repositorio.Delete($"api/actores/{actor.Id}");
+        if(responseHTTP.Error)
+        {
+            if(responseHTTP.HttpResponseMessage.StatusCode==System.Net.HttpStatusCode.NotFound)
+            {
+                navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                var mensajeError = await responseHTTP.ObtenerMensajeError();
+                await swal.FireAsync("ERROR", mensajeError, SweetAlertIcon.Error);
+            }
+        }
+        else
+        {
+            await Cargar();
+        }
+    }
+
+}

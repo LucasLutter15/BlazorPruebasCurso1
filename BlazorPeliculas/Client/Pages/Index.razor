@@ -1,0 +1,31 @@
+﻿@page "/"
+@inject IRepositorio repositorio
+
+<PageTitle>Blazor Peliculoas</PageTitle>
+
+<div>
+    <h3>En Cartelera</h3>
+    <ListadoPeliculas Peliculas="EnCartelera" />
+</div>
+
+
+<div>
+    <h3>Proximos estrenos</h3>
+    <ListadoPeliculas Peliculas="FuturosEstrenos" />
+</div>
+
+
+
+@code {
+    private List<Pelicula>? EnCartelera;
+    private List<Pelicula>? FuturosEstrenos;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var respuestaHttp = await repositorio.Get<HomaPageDTO>("api/peliculas");
+        FuturosEstrenos = respuestaHttp.Response!.ProximosEstrenos;
+        EnCartelera = respuestaHttp.Response!.PeliculasEnCartelera;
+    }
+
+}

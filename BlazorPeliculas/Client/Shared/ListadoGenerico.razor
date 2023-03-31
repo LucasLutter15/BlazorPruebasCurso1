@@ -1,0 +1,59 @@
+﻿@typeparam Titem
+
+@if (Listado is null)
+{
+    @if (Cargando is null)
+    {
+                <img alt="cargando"
+     src="http://static.demilked.com/wp-content/uploads/2016/06/gif-animations-replace-loading-screen-14.gif" />
+    }
+    else
+    {
+        @Cargando
+    }
+}
+else if (Listado.Count == 0)
+{
+    @if (NohayRegistros is null)
+    {
+             <p>No hay peliculas para mostrar</p>   
+    }
+    else
+    {
+        @NohayRegistros
+    }
+}
+else
+{
+    if(HayRegistros is not null)
+    {
+        foreach (var elemento in Listado)
+        {
+            @HayRegistros(elemento)
+        }
+    }
+    else
+    {
+        @HayRegistrosCompleto
+    }
+
+    
+}
+
+@code {
+
+    [Parameter]
+    public RenderFragment Cargando { get; set; } = null!;
+    [Parameter]
+    public RenderFragment NohayRegistros { get; set; } = null!;
+    [Parameter]
+    public RenderFragment<Titem> HayRegistros { get; set; } = null!;
+
+    [Parameter]
+    public RenderFragment HayRegistrosCompleto { get; set; } = null!;
+
+    [Parameter]
+    [EditorRequired]
+    public List<Titem> Listado { get; set; } = null!;
+
+}
